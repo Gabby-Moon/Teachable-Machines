@@ -53,6 +53,22 @@
 
         let model, webcam, labelContainer, maxPredictions;
         let isRunning = false;
+        let backgroundUpdateTimeout = null;
+        let pendingBackgroundColor = null;
+
+        function setBackgroundColorWithDelay(color, delay = 200) {
+            if (pendingBackgroundColor === color) return;
+
+            pendingBackgroundColor = color;
+            if (backgroundUpdateTimeout) {
+                clearTimeout(backgroundUpdateTimeout);
+            }
+
+            backgroundUpdateTimeout = setTimeout(() => {
+                document.body.style.backgroundColor = pendingBackgroundColor;
+                backgroundUpdateTimeout = null;
+            }, delay);
+        }
 
         async function init() {
             model = await tmImage.load(URL + "model.json", URL + "metadata.json");
@@ -96,15 +112,15 @@
             
 	    }
 
-	if (topClass.className === "Scissor" && topClass.probability > 0.8) {
-    		document.body.style.backgroundColor = "PaleGreen"; // green
-	} else if (topClass.className === "Paper" && topClass.probability > 0.8) {
-    		document.body.style.backgroundColor = "Pink"; // red
-	} else if (topClass.className === "Rock" && topClass.probability > 0.8){
-		document.body.style.backgroundColor = "LightSkyBlue";
-	} else {
-    		document.body.style.backgroundColor = "white";
-	}
+    if (topClass.className === "Scissor" && topClass.probability > 0.8) {
+            setBackgroundColorWithDelay("PaleGreen"); // green
+    } else if (topClass.className === "Paper" && topClass.probability > 0.8) {
+            setBackgroundColorWithDelay("Pink"); // red
+    } else if (topClass.className === "Rock" && topClass.probability > 0.8){
+        setBackgroundColorWithDelay("LightSkyBlue");
+    } else {
+            setBackgroundColorWithDelay("white");
+    }
 
             // topClass.className is the winning label
             // topClass.probability is how confident the model is
